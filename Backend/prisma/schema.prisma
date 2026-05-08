@@ -109,7 +109,6 @@ model Favorite {
 
   session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
-  // ✅ Nom explicite du compound key pour Prisma (utilisé dans favoriteController)
   @@id([userToken, sessionId])
   @@map("favorites")
 }
