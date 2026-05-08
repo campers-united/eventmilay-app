@@ -34,3 +34,16 @@ export const getEventById = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la récupération de l'événement" });
   }
 };
+
+// POST /api/events
+export const createEvent = async (req, res) => {
+  try {
+    const { title, description, location, coverColor, startDate, endDate } = req.body;
+    const event = await prisma.event.create({
+      data: { title, description, location, coverColor, startDate: new Date(startDate), endDate: new Date(endDate) },
+    });
+    res.status(201).json(event);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors de la création de l'événement" });
+  }
+};
