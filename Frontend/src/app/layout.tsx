@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import AppLayout from "@/layouts/AppLayout";
-import { Providers } from "@/app/providers";
+import { Providers } from "../app/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
