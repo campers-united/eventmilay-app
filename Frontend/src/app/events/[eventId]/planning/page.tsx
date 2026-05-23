@@ -1,5 +1,5 @@
 import PlanningPage from "@/pages/PlanningPage";
 
-export default function Page() {
+export default function Planning() {
   return <PlanningPage />;
 }

@@ -1,108 +1,128 @@
 "use client";
-
-import Image from "next/image";
+import React from "react";
 import Link from "next/link";
 import { Clock, MapPin, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { LiveBadge } from "@/components/LiveBadge";
+import { Badge } from "@/components/ui/badge";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useNow } from "@/hooks/useNow";
 import type { ApiSession } from "@/lib/apiClient";
-import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 function fmt(d: string) {
   return new Date(d).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
-function isLive(s: ApiSession, ref: Date) {
-  return new Date(s.startTime) <= ref && new Date(s.endTime) >= ref;
+interface SessionCardProps {
+  session: ApiSession;
 }
 
-export function SessionCard({ session, compact = false }: { session: ApiSession; compact?: boolean }) {
-  const now = useNow(15_000);
-  const [mounted, setMounted] = useState(false);
-  const live = isLive(session, now);
+export function SessionCard({ session: s }: SessionCardProps) {
+  const now = useNow();
   const { isFavorite, toggle } = useFavorites();
-  const fav = isFavorite(session.id);
-
-  useEffect(() => { setMounted(true); }, []);
+  const live = new Date(s.startTime) <= now && new Date(s.endTime) >= now;
+  const fav = isFavorite(s.id);
+  // Backend: speakers is SessionSpeaker[] with nested .speaker.fullName
+  const speakerNames = s.speakers
+    ?.map((sp) => sp.speaker?.fullName ?? "")
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <Card
-      className={cn(
-        "group relative overflow-hidden border-border/60 bg-card/70 backdrop-blur-sm p-4 hover-lift card-sheen",
-        live && "border-live/50 shadow-glow animate-pop-in"
-      )}
+      style={{
+        padding: "1.25rem",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        borderColor: live ? "rgba(255,68,68,0.4)" : undefined,
+        boxShadow: live ? "0 0 20px rgba(255,68,68,0.15)" : undefined,
+      }}
     >
-      {live && (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -inset-px rounded-[inherit] bg-gradient-live opacity-20 blur-xl animate-glow-pulse"
-        />
-      )}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            {live && <LiveBadge />}
-            {session.track && (
-              <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
-                {session.track}
-              </Badge>
-            )}
-          </div>
-          <Link href={`/sessions/${session.id}`} className="block">
-            <h3 className="font-display font-semibold text-base leading-snug group-hover:text-primary-glow transition-smooth">
-              {session.title}
-            </h3>
-          </Link>
-          {!compact && (
-            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{session.description}</p>
-          )}
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" />
-              <span suppressHydrationWarning>
-                {mounted ? `${fmt(session.startTime)} – ${fmt(session.endTime)}` : "--:-- – --:--"}
-              </span>
-            </span>
-            {session.room && (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5" />
-                {session.room.name}
-              </span>
-            )}
-          </div>
-          {!compact && session.speakers.length > 0 && (
-            <div className="mt-3 flex -space-x-2">
-              {session.speakers.map(({ speaker }) =>
-                speaker.photoUrl ? (
-                  <Image
-                    key={speaker.id}
-                    src={speaker.photoUrl}
-                    alt={speaker.fullName}
-                    title={speaker.fullName}
-                    width={28}
-                    height={28}
-                    className="h-7 w-7 rounded-full ring-2 ring-card object-cover"
-                  />
-                ) : null
-              )}
-            </div>
-          )}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          {live && <LiveBadge />}
+          {s.track && <Badge variant="secondary">{s.track}</Badge>}
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={fav ? "Retirer des favoris" : "Ajouter aux favoris"}
-          onClick={(e) => { e.preventDefault(); toggle(session.id); }}
-          className={cn("shrink-0", fav && "text-primary-glow")}
+        <button
+          onClick={(e) => { e.preventDefault(); toggle(s.id); }}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: fav ? "#f059c8" : "var(--muted-foreground)",
+            fontSize: "1rem",
+            padding: "0.25rem",
+            flexShrink: 0,
+          }}
+          title={fav ? "Retirer des favoris" : "Ajouter aux favoris"}
         >
-          <Star className={cn("h-4 w-4", fav && "fill-current")} />
-        </Button>
+          <Star style={{ width: "1rem", height: "1rem", fill: fav ? "currentColor" : "none" }} />
+        </button>
       </div>
+
+      <Link href={`/sessions/${s.id}`} style={{ textDecoration: "none", flex: 1 }}>
+        <h3
+          style={{
+            marginTop: "0.75rem",
+            fontWeight: 600,
+            fontSize: "1rem",
+            lineHeight: 1.375,
+            color: "var(--foreground)",
+          }}
+        >
+          {s.title}
+        </h3>
+        {s.description && (
+          <p
+            style={{
+              marginTop: "0.375rem",
+              fontSize: "0.875rem",
+              color: "var(--muted-foreground)",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {s.description}
+          </p>
+        )}
+      </Link>
+
+      <div
+        style={{
+          marginTop: "0.75rem",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "0.75rem",
+          fontSize: "0.75rem",
+          color: "var(--muted-foreground)",
+        }}
+      >
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+          <Clock style={{ width: "0.875rem", height: "0.875rem" }} />
+          {fmt(s.startTime)} – {fmt(s.endTime)}
+        </span>
+        {s.room && (
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+            <MapPin style={{ width: "0.875rem", height: "0.875rem" }} />
+            {s.room.name}
+          </span>
+        )}
+      </div>
+
+      {speakerNames && (
+        <div
+          style={{
+            marginTop: "0.5rem",
+            fontSize: "0.75rem",
+            color: "var(--primary-glow)",
+          }}
+        >
+          {speakerNames}
+        </div>
+      )}
     </Card>
   );
 }

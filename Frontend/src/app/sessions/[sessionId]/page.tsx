@@ -1,5 +1,5 @@
-import SessionDetailPage from "@/pages/SessionDetailPage";
+import SessionPage from "@/pages/SessionPage";
 
-export default function Page() {
-  return <SessionDetailPage />;
+export default function Session() {
+  return <SessionPage />;
 }

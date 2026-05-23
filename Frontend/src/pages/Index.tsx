@@ -10,10 +10,6 @@ import { useEffect, useState } from "react";
 import { api, type ApiEvent, type ApiSession } from "@/lib/apiClient";
 import { useNow } from "@/hooks/useNow";
 
-function isLive(s: ApiSession, ref: Date) {
-  return new Date(s.startTime) <= ref && new Date(s.endTime) >= ref;
-}
-
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString("fr-FR", {
     day: "numeric",
@@ -26,10 +22,11 @@ export default function Index() {
   const now = useNow();
   const [events, setEvents] = useState<ApiEvent[]>([]);
   const [liveSessions, setLiveSessions] = useState<ApiSession[]>([]);
+  const [apiError, setApiError] = useState(false);
 
   useEffect(() => {
-    api.events.list().then(setEvents).catch(console.error);
-    api.sessions.live().then(setLiveSessions).catch(console.error);
+    api.events.list().then(setEvents).catch(() => setApiError(true));
+    api.sessions.live().then(setLiveSessions).catch(() => {}); // optional
   }, []);
 
   // Refresh live sessions every 30s
@@ -59,7 +56,7 @@ export default function Index() {
           </p>
           <div className="mt-6 sm:mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="bg-gradient-primary text-primary-foreground border-0 shadow-glow hover:opacity-90">
-              <Link href="/events/ev1/planning">
+              <Link href="/live">
                 Voir le planning <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -72,6 +69,33 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* API error banner */}
+      {apiError && (
+        <div
+          style={{
+            marginTop: "1.5rem",
+            padding: "1rem 1.25rem",
+            borderRadius: "0.875rem",
+            background: "rgba(255,68,68,0.08)",
+            border: "1px solid rgba(255,68,68,0.25)",
+            fontSize: "0.875rem",
+            color: "#ff8888",
+          }}
+        >
+          ⚠️ Le backend n&apos;est pas accessible. Lancez le serveur avec{" "}
+          <code
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              padding: "0.1rem 0.4rem",
+              borderRadius: "0.3rem",
+            }}
+          >
+            node src/server.js
+          </code>{" "}
+          dans le dossier <code style={{ background: "rgba(255,255,255,0.08)", padding: "0.1rem 0.4rem", borderRadius: "0.3rem" }}>Backend/</code>.
+        </div>
+      )}
 
       {/* Sessions live */}
       {liveSessions.length > 0 && (
@@ -103,36 +127,53 @@ export default function Index() {
         <div className="flex items-end justify-between mb-5 sm:mb-6">
           <h2 className="font-display text-xl sm:text-2xl font-semibold">Événements à l&apos;affiche</h2>
         </div>
-        <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {events.map((ev) => (
-            <Link key={ev.id} href={`/events/${ev.id}`} className="group">
-              <Card className="overflow-hidden border-border/60 bg-card/70 backdrop-blur transition-smooth hover:-translate-y-1 hover:shadow-elegant h-full flex flex-col">
-                <div className={`h-28 sm:h-32 bg-gradient-to-br ${ev.coverColor ?? "from-primary to-accent"} relative`}>
-                  <div className="absolute inset-0 bg-background/20" />
-                </div>
-                <div className="p-4 sm:p-5 flex-1 flex flex-col">
-                  <Badge variant="secondary" className="self-start mb-2 text-[10px] uppercase tracking-wider">
-                    {fmtDate(ev.startDate)}
-                  </Badge>
-                  <h3 className="font-display font-semibold text-base sm:text-lg group-hover:text-primary-glow transition-smooth">
-                    {ev.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2 flex-1">{ev.description}</p>
-                  <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {fmtDate(ev.startDate)}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {ev.location}
-                    </span>
+        {events.length === 0 && !apiError ? (
+          <div
+            style={{
+              padding: "3rem",
+              textAlign: "center",
+              color: "var(--muted-foreground)",
+              background: "rgba(26,26,36,0.4)",
+              borderRadius: "1rem",
+              border: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            {apiError ? "Impossible de charger les événements." : "Aucun événement pour l'instant."}
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {events.map((ev) => (
+              <Link key={ev.id} href={`/events/${ev.id}`} className="group">
+                <Card className="overflow-hidden border-border/60 bg-card/70 backdrop-blur transition-smooth hover:-translate-y-1 hover:shadow-elegant h-full flex flex-col">
+                  <div className={`h-28 sm:h-32 bg-gradient-to-br ${ev.coverColor ?? "from-primary to-accent"} relative`}>
+                    <div className="absolute inset-0 bg-background/20" />
                   </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col">
+                    <Badge variant="secondary" className="self-start mb-2 text-[10px] uppercase tracking-wider">
+                      {fmtDate(ev.startDate)}
+                    </Badge>
+                    <h3 className="font-display font-semibold text-base sm:text-lg group-hover:text-primary-glow transition-smooth">
+                      {ev.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2 flex-1">{ev.description}</p>
+                    <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5" />
+                        {fmtDate(ev.startDate)}
+                      </span>
+                      {ev.location && (
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5" />
+                          {ev.location}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

@@ -1,5 +1,5 @@
 import LivePage from "@/pages/LivePage";
 
-export default function Page() {
+export default function Live() {
   return <LivePage />;
 }
