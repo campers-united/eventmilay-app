@@ -1,4 +1,4 @@
-import EventPage from "@/pages/EnventPage";
+import EventPage from "@/pages/EventPage";
 
 export default function Event() {
   return <EventPage />;
