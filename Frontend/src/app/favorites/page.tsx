@@ -12,6 +12,13 @@ import { getUserToken } from "@/lib/userToken";
 export default function Favorites() {
   const { favorites } = useFavorites();
   const [favSessions, setFavSessions] = useState<ApiSession[]>([]);
+  const [browseEventId, setBrowseEventId] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.events.list().then((data) => {
+      if (data.length > 0) setBrowseEventId(data[0].id);
+    });
+  }, []);
 
   useEffect(() => {
     const userToken = getUserToken();
@@ -53,7 +60,9 @@ export default function Favorites() {
             Aucune session favorite pour l&apos;instant.
           </p>
           <Button asChild className="bg-gradient-primary text-primary-foreground border-0">
-            <Link href="/events/ev1/planning">Parcourir le planning</Link>
+            <Link href={browseEventId ? `/events/${browseEventId}/planning` : "/live"}>
+              Parcourir le planning
+            </Link>
           </Button>
         </div>
       ) : (
