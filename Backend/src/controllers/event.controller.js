@@ -30,9 +30,9 @@ export const getEventById = async (req, res) => {
 
 export const createEvent = async (req, res) => {
   try {
-    const { title, description, location, coverColor, startDate, endDate } = req.body;
+    const { title, description, location, coverColor, coverPicture, startDate, endDate } = req.body;
     const event = await prisma.event.create({
-      data: { title, description, location, coverColor, startDate: new Date(startDate), endDate: new Date(endDate) },
+      data: { title, description, location, coverColor, coverPicture, startDate: new Date(startDate), endDate: new Date(endDate) },
     });
     res.status(201).json(event);
   } catch (err) { res.status(500).json({ error: "Erreur création événement", detail: err.message }); }
@@ -40,10 +40,10 @@ export const createEvent = async (req, res) => {
 
 export const updateEvent = async (req, res) => {
   try {
-    const { title, description, location, coverColor, startDate, endDate } = req.body;
+    const { title, description, location, coverColor, coverPicture, startDate, endDate } = req.body;
     const event = await prisma.event.update({
       where: { id: req.params.id },
-      data: { title, description, location, coverColor,
+      data: { title, description, location, coverColor, coverPicture,
         ...(startDate && { startDate: new Date(startDate) }),
         ...(endDate   && { endDate:   new Date(endDate)   }),
       },

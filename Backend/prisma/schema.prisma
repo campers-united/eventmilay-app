@@ -45,15 +45,16 @@ model Room {
 }
 
 model Event {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  location    String?
-  coverColor  String?  @default("from-primary to-accent") @map("cover_color")
-  startDate   DateTime @map("start_date")
-  endDate     DateTime @map("end_date")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  location     String?
+  coverColor   String?  @default("from-primary to-accent") @map("cover_color")
+  coverPicture String?  @map("cover_picture")
+  startDate    DateTime @map("start_date")
+  endDate      DateTime @map("end_date")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   sessions Session[]
 

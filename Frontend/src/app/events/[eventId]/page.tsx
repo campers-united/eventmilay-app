@@ -52,11 +52,16 @@ export default function Event() {
   return (
     <div className="px-4 sm:px-8 py-8 max-w-7xl mx-auto w-full">
       <div className="rounded-2xl sm:rounded-3xl overflow-hidden border border-border/60 shadow-elegant">
-        <div
-          className={`h-36 sm:h-44 bg-gradient-to-br ${
-            ev.coverColor ?? "from-primary to-accent"
-          } relative`}
-        >
+        <div className="h-48 sm:h-64 relative overflow-hidden bg-muted">
+          {ev.coverPicture ? (
+            <img
+              src={ev.coverPicture}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className={`absolute inset-0 bg-gradient-to-br ${ev.coverColor ?? "from-primary to-accent"}`} />
+          )}
           <div className="absolute inset-0 bg-background/30" />
         </div>
         <div className="bg-card/70 backdrop-blur p-5 sm:p-8">
