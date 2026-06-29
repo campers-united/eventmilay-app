@@ -43,6 +43,16 @@ export default function Home() {
     <div className="px-4 sm:px-8 py-8 sm:py-10 max-w-7xl mx-auto w-full">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border/60 bg-card/40 backdrop-blur-md p-6 sm:p-10 lg:p-14 shadow-elegant">
+        <div className="absolute inset-0 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center no-repeat"
+            style={{
+              backgroundImage: "url('/hero-bg.jpg')",
+              filter: "blur(2px) brightness(0.72)",
+            }}
+          />
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
         <div className="absolute inset-0 bg-gradient-primary opacity-10 pointer-events-none" />
         <div className="relative max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/40 px-3 py-1 text-xs text-muted-foreground mb-5">
