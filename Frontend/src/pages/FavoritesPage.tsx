@@ -15,10 +15,16 @@ export default function FavoritesPage() {
 
   useEffect(() => {
     if (favorites.length === 0) { setFavSessions([]); return; }
-    // Récupère les données complètes via /favorites?userToken=...
-    api.favorites.list(getUserToken()).then((data) => {
-      setFavSessions(data.filter((f) => f.session).map((f) => f.session as ApiSession));
-    }).catch(console.error);
+    // Push local favorites to server first (migration/optimistic sync), then fetch
+    const userToken = getUserToken();
+    Promise.all(
+      favorites.map((sid) => api.favorites.add(sid, userToken).catch(() => undefined))
+    )
+      .then(() => api.favorites.list(userToken))
+      .then((data) => {
+        setFavSessions(data.filter((f) => f.session).map((f) => f.session as ApiSession));
+      })
+      .catch(console.error);
   }, [favorites]);
 
   return (

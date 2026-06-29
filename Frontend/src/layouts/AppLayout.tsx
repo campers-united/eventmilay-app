@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Radio, Star, Calendar, Home } from "lucide-react";
+import { FavoritesProvider } from "@/hooks/useFavorites";
 
 const navLinks = [
   { href: "/", label: "Accueil", icon: Home },
@@ -14,7 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
 
   return (
-    <>
+    <FavoritesProvider>
       <nav>
         <div className="nav-inner">
           <Link href="/" className="nav-brand">
@@ -49,6 +50,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       >
         © 2025 EventMilay — Plateforme événementielle
       </footer>
-    </>
+    </FavoritesProvider>
   );
 }
