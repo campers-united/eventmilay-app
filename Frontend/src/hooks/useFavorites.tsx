@@ -37,22 +37,9 @@ function writeStored(ids: string[]) {
 function syncToBackend(sessionId: string, adding: boolean) {
   const userToken = getUserToken();
   if (adding) {
-    // #region agent log
-    fetch('http://127.0.0.1:7609/ingest/00a67ad0-b1f0-41fe-bc1e-b8a78678814b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'924aaa'},body:JSON.stringify({sessionId:'924aaa',location:'useFavorites.ts:add',message:'calling API add',data:{sessionId,userToken},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     api.favorites
       .add(sessionId, userToken)
-      .then((res) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7609/ingest/00a67ad0-b1f0-41fe-bc1e-b8a78678814b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'924aaa'},body:JSON.stringify({sessionId:'924aaa',location:'useFavorites.ts:addOk',message:'API add success',data:{sessionId,result:res},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
-      })
-      .catch((err) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7609/ingest/00a67ad0-b1f0-41fe-bc1e-b8a78678814b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'924aaa'},body:JSON.stringify({sessionId:'924aaa',location:'useFavorites.ts:addErr',message:'API add failed',data:{sessionId,error:String(err)},timestamp:Date.now(),hypothesisId:'A,C'})}).catch(()=>{});
-        // #endregion
-        console.error(err);
-      });
+      .catch(console.error);
   } else {
     api.favorites.remove(sessionId, userToken).catch(console.error);
   }
@@ -63,9 +50,6 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = readStored();
-    // #region agent log
-    fetch('http://127.0.0.1:7609/ingest/00a67ad0-b1f0-41fe-bc1e-b8a78678814b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'924aaa'},body:JSON.stringify({sessionId:'924aaa',location:'useFavorites.ts:init',message:'loaded from localStorage',data:{stored,count:stored.length},timestamp:Date.now(),hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     setFavorites(stored);
 
     const userToken = getUserToken();
