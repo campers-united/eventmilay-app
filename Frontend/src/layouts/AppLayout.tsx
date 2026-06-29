@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Radio, Star, Calendar, Home, Users } from "lucide-react";
+import { FavoritesProvider } from "@/hooks/useFavorites";
 
 const navLinks = [
   { href: "/", label: "Accueil", icon: Home },
