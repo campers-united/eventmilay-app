@@ -14,16 +14,29 @@ export default function Favorites() {
   const [favSessions, setFavSessions] = useState<ApiSession[]>([]);
 
   useEffect(() => {
+    const userToken = getUserToken();
+    // #region agent log
+    fetch('http://127.0.0.1:7609/ingest/00a67ad0-b1f0-41fe-bc1e-b8a78678814b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'924aaa'},body:JSON.stringify({sessionId:'924aaa',location:'favorites/page.tsx:useEffect',message:'favorites page load',data:{localFavorites:favorites,localCount:favorites.length,userToken},timestamp:Date.now(),hypothesisId:'B,E'})}).catch(()=>{});
+    // #endregion
     if (favorites.length === 0) {
       setFavSessions([]);
       return;
     }
     api.favorites
-      .list(getUserToken())
+      .list(userToken)
       .then((data) => {
-        setFavSessions(data.filter((f) => f.session).map((f) => f.session as ApiSession));
+        const sessions = data.filter((f) => f.session).map((f) => f.session as ApiSession);
+        // #region agent log
+        fetch('http://127.0.0.1:7609/ingest/00a67ad0-b1f0-41fe-bc1e-b8a78678814b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'924aaa'},body:JSON.stringify({sessionId:'924aaa',location:'favorites/page.tsx:apiSuccess',message:'API favorites list response',data:{localCount:favorites.length,apiCount:data.length,sessionCount:sessions.length,apiSessionIds:data.map(f=>f.sessionId),localSessionIds:favorites},timestamp:Date.now(),hypothesisId:'B,D'})}).catch(()=>{});
+        // #endregion
+        setFavSessions(sessions);
       })
-      .catch(console.error);
+      .catch((err) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7609/ingest/00a67ad0-b1f0-41fe-bc1e-b8a78678814b',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'924aaa'},body:JSON.stringify({sessionId:'924aaa',location:'favorites/page.tsx:apiError',message:'API favorites list failed',data:{error:String(err),localCount:favorites.length},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
+        console.error(err);
+      });
   }, [favorites]);
 
   return (
