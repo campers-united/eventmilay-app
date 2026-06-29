@@ -18,6 +18,7 @@ export interface ApiSpeaker {
   bio?: string;
   twitter?: string;
   linkedin?: string;
+  website?: string;
 }
 
 export interface ApiSession {
@@ -32,6 +33,17 @@ export interface ApiSession {
   room?: { id: string; name: string; capacity?: number };
   // Backend: speakers is SessionSpeaker[] with nested speaker object
   speakers?: Array<{ speaker: ApiSpeaker; sortOrder: number }>;
+}
+
+export interface ApiSpeakerSession {
+  sessionId: string;
+  speakerId: string;
+  sortOrder: number;
+  session: ApiSession & { event: ApiEvent };
+}
+
+export interface ApiSpeakerDetail extends ApiSpeaker {
+  sessions: ApiSpeakerSession[];
 }
 
 export interface ApiEventDetail extends ApiEvent {
@@ -101,7 +113,7 @@ export const api = {
   // GET /api/speakers  •  GET /api/speakers/:id
   speakers: {
     list: () => get<ApiSpeaker[]>("/api/speakers"),
-    get: (id: string) => get<ApiSpeaker>(`/api/speakers/${id}`),
+    get: (id: string) => get<ApiSpeakerDetail>(`/api/speakers/${id}`),
   },
   // Questions — add route to backend if needed
   questions: {
@@ -111,6 +123,21 @@ export const api = {
       post<ApiQuestion>(`/api/sessions/${sessionId}/questions`, { content, authorName }),
     upvote: (questionId: string) =>
       patchReq<ApiQuestion>(`/api/questions/${questionId}/upvote`),
+  },
+  // Upload image — POST /api/upload (multipart/form-data, requires auth)
+  upload: {
+    image: (file: File, token: string) => {
+      const formData = new FormData();
+      formData.append("image", file);
+      return fetch(`${BASE_URL}/api/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      }).then((res) => {
+        if (!res.ok) throw new Error(`Upload ${res.status}`);
+        return res.json() as Promise<{ url: string; filename: string }>;
+      });
+    },
   },
   // Favorites — add route to backend if needed
   favorites: {
