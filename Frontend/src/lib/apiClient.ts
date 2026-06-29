@@ -18,6 +18,7 @@ export interface ApiSpeaker {
   bio?: string;
   twitter?: string;
   linkedin?: string;
+  website?: string;
 }
 
 export interface ApiSession {
@@ -110,6 +111,21 @@ export const api = {
       post<ApiQuestion>(`/api/sessions/${sessionId}/questions`, { content, authorName }),
     upvote: (questionId: string) =>
       patchReq<ApiQuestion>(`/api/questions/${questionId}/upvote`),
+  },
+  // Upload image — POST /api/upload (multipart/form-data, requires auth)
+  upload: {
+    image: (file: File, token: string) => {
+      const formData = new FormData();
+      formData.append("image", file);
+      return fetch(`${BASE_URL}/api/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      }).then((res) => {
+        if (!res.ok) throw new Error(`Upload ${res.status}`);
+        return res.json() as Promise<{ url: string; filename: string }>;
+      });
+    },
   },
   // Favorites — add route to backend if needed
   favorites: {

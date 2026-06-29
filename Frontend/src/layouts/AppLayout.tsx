@@ -2,11 +2,12 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Radio, Star, Calendar, Home } from "lucide-react";
+import { Radio, Star, Calendar, Home, Users } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Accueil", icon: Home },
   { href: "/live", label: "Live", icon: Radio },
+  { href: "/speakers", label: "Intervenants", icon: Users },
   { href: "/favorites", label: "Favoris", icon: Star },
 ];
 

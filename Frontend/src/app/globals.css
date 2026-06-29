@@ -183,6 +183,19 @@ a {
 .hover\:text-primary\/90:hover { color: var(--primary); opacity: 0.9; }
 .hover\:shadow-elegant:hover { box-shadow: 0 4px 32px rgba(0,0,0,0.4); }
 
+/* Loading spinner */
+.loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: var(--primary-glow);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Animations */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
