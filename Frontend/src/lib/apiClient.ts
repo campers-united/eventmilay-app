@@ -95,6 +95,7 @@ async function patchReq<T>(path: string, body?: unknown): Promise<T> {
 async function del<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, { method: "DELETE" });
   if (!res.ok) throw new Error(`API ${res.status} — ${path}`);
+  if (res.status === 204) return undefined as T;
   return res.json();
 }
 

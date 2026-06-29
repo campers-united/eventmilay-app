@@ -24,6 +24,8 @@ export default function Home() {
   const [liveSessions, setLiveSessions] = useState<ApiSession[]>([]);
   const [apiError, setApiError] = useState(false);
 
+  const firstEvent = events[0] ?? null;
+
   useEffect(() => {
     api.events.list().then(setEvents).catch(() => setApiError(true));
     api.sessions.live().then(setLiveSessions).catch(() => {}); // optional
@@ -60,7 +62,7 @@ export default function Home() {
               size="lg"
               className="bg-gradient-primary text-primary-foreground border-0 shadow-glow hover:opacity-90"
             >
-              <Link href="/live">
+              <Link href={firstEvent ? `/events/${firstEvent.id}/planning` : "/live"}>
                 Voir le planning <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

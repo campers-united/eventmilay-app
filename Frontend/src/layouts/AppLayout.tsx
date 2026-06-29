@@ -15,7 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
 
   return (
-    <>
+    <FavoritesProvider>
       <nav>
         <div className="nav-inner">
           <Link href="/" className="nav-brand">
@@ -48,8 +48,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           color: "var(--muted-foreground)",
         }}
       >
-        © 2025 EventMilay — Plateforme événementielle
+        © 2026 EventMilay — powered by Fiderana & Tsilavina & Mandrindra
       </footer>
-    </>
+    </FavoritesProvider>
   );
 }
