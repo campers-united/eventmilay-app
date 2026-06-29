@@ -48,7 +48,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           color: "var(--muted-foreground)",
         }}
       >
-        © 2025 EventMilay — Plateforme événementielle
+        © 2026 EventMilay — powered by Fiderana & Tsilavina & Mandrindra
       </footer>
     </FavoritesProvider>
   );
