@@ -172,9 +172,18 @@ export default function Home() {
             {events.map((ev) => (
               <Link key={ev.id} href={`/events/${ev.id}`} className="group">
                 <Card className="overflow-hidden border-border/60 bg-card/70 backdrop-blur transition-smooth hover:-translate-y-1 hover:shadow-elegant h-full flex flex-col">
-                  <div
-                    className={`h-28 sm:h-32 bg-gradient-to-br ${ev.coverColor ?? "from-primary to-accent"} relative`}
-                  >
+                  <div className="h-28 sm:h-32 relative overflow-hidden">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${ev.coverColor ?? "from-primary to-accent"}`} />
+                    {ev.coverPicture && (
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage: `url(${ev.coverPicture})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      />
+                    )}
                     <div className="absolute inset-0 bg-background/20" />
                   </div>
                   <div className="p-4 sm:p-5 flex-1 flex flex-col">

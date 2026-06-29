@@ -9,6 +9,7 @@ export interface ApiEvent {
   endDate: string;
   location?: string;
   coverColor?: string;
+  coverPicture?: string;
 }
 
 export interface ApiSpeaker {
