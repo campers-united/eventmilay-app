@@ -35,6 +35,17 @@ export interface ApiSession {
   speakers?: Array<{ speaker: ApiSpeaker; sortOrder: number }>;
 }
 
+export interface ApiSpeakerSession {
+  sessionId: string;
+  speakerId: string;
+  sortOrder: number;
+  session: ApiSession & { event: ApiEvent };
+}
+
+export interface ApiSpeakerDetail extends ApiSpeaker {
+  sessions: ApiSpeakerSession[];
+}
+
 export interface ApiEventDetail extends ApiEvent {
   sessions: ApiSession[];
 }
@@ -101,7 +112,7 @@ export const api = {
   // GET /api/speakers  •  GET /api/speakers/:id
   speakers: {
     list: () => get<ApiSpeaker[]>("/api/speakers"),
-    get: (id: string) => get<ApiSpeaker>(`/api/speakers/${id}`),
+    get: (id: string) => get<ApiSpeakerDetail>(`/api/speakers/${id}`),
   },
   // Questions — add route to backend if needed
   questions: {

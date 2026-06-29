@@ -14,7 +14,22 @@ export const getAllSpeakers = async (req, res) => {
 
 export const getSpeakerById = async (req, res) => {
   try {
-    const speaker = await prisma.speaker.findUnique({ where: { id: req.params.id } });
+    const speaker = await prisma.speaker.findUnique({
+      where: { id: req.params.id },
+      include: {
+        sessions: {
+          include: {
+            session: {
+              include: {
+                event: true,
+                room: true,
+              },
+            },
+          },
+          orderBy: { session: { startTime: "desc" } },
+        },
+      },
+    });
     if (!speaker) return res.status(404).json({ error: "Intervenant introuvable" });
     res.json(speaker);
   } catch { res.status(500).json({ error: "Erreur récupération intervenant" }); }
