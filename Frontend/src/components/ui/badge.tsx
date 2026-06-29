@@ -3,10 +3,11 @@ import React from "react";
 interface BadgeProps {
   variant?: "default" | "secondary" | "live";
   className?: string;
+  style?: React.CSSProperties;
   children?: React.ReactNode;
 }
 
-export function Badge({ variant = "default", className = "", children }: BadgeProps) {
+export function Badge({ variant = "default", className = "", style, children }: BadgeProps) {
   const base: React.CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
@@ -24,7 +25,7 @@ export function Badge({ variant = "default", className = "", children }: BadgePr
   };
 
   return (
-    <span style={{ ...base, ...variants[variant] }} className={className}>
+    <span style={{ ...base, ...variants[variant], ...style }} className={className}>
       {children}
     </span>
   );
